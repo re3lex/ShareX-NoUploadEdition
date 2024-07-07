@@ -24,9 +24,3 @@ So I decided to fork ShareX repo, cut image upload and OCR functionality to meet
 * Scrolling screenshot: https://getsharex.com/docs/scrolling-screenshot
 * Command line arguments: https://getsharex.com/docs/command-line-arguments
 * Translation: https://getsharex.com/docs/translation
-* OCR: https://getsharex.com/docs/ocr
-* Custom uploader: https://getsharex.com/docs/custom-uploader
-* Amazon S3 guide: https://getsharex.com/docs/amazon-s3
-* Google Cloud Storage guide: https://getsharex.com/docs/google-cloud-storage
-* Cloudflare R2 guide: https://getsharex.com/docs/cloudflare-r2
-* Brand assets: https://getsharex.com/brand-assets
