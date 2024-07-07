@@ -30,8 +30,6 @@ using ShareX.IndexerLib;
 using ShareX.MediaLib;
 using ShareX.Properties;
 using ShareX.ScreenCaptureLib;
-using ShareX.UploadersLib;
-using ShareX.UploadersLib.SharingServices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -85,9 +83,7 @@ namespace ShareX
                 case HotkeyType.ClipboardUploadWithContentViewer:
                     UploadManager.ClipboardUploadWithContentViewer(safeTaskSettings);
                     break;
-                case HotkeyType.UploadText:
-                    UploadManager.ShowTextUploadDialog(safeTaskSettings);
-                    break;
+
                 case HotkeyType.UploadURL:
                     UploadManager.UploadURL(safeTaskSettings);
                     break;
@@ -195,9 +191,6 @@ namespace ShareX
                     break;
                 case HotkeyType.PinToScreenFromFile:
                     PinToScreenFromFile();
-                    break;
-                case HotkeyType.PinToScreenCloseAll:
-                    PinToScreenCloseAll();
                     break;
                 case HotkeyType.ImageEditor:
                     if (command != null && !string.IsNullOrEmpty(command.Parameter) && File.Exists(command.Parameter))
@@ -1334,12 +1327,12 @@ namespace ShareX
 
         public static void SearchImageUsingGoogleLens(string url)
         {
-            new GoogleLensSharingService().CreateSharer(null, null).ShareURL(url);
+            
         }
 
         public static void SearchImageUsingBing(string url)
         {
-            new BingVisualSearchSharingService().CreateSharer(null, null).ShareURL(url);
+            
         }
 
         public static async Task OCRImage(TaskSettings taskSettings = null)
@@ -1508,40 +1501,9 @@ namespace ShareX
             }
         }
 
-        public static void PinToScreenCloseAll()
-        {
-            PinToScreenForm.CloseAll();
-
-            PlayPopSound();
-        }
-
         public static void TweetMessage()
         {
-            if (IsUploadAllowed())
-            {
-                if (Program.UploadersConfig != null && Program.UploadersConfig.TwitterOAuthInfoList != null)
-                {
-                    OAuthInfo twitterOAuth = Program.UploadersConfig.TwitterOAuthInfoList.ReturnIfValidIndex(Program.UploadersConfig.TwitterSelectedAccount);
-
-                    if (twitterOAuth != null && OAuthInfo.CheckOAuth(twitterOAuth))
-                    {
-                        Task.Run(() =>
-                        {
-                            using (TwitterTweetForm twitter = new TwitterTweetForm(twitterOAuth))
-                            {
-                                if (twitter.ShowDialog() == DialogResult.OK && twitter.IsTweetSent)
-                                {
-                                    ShowNotificationTip(Resources.TaskHelpers_TweetMessage_Tweet_successfully_sent_);
-                                }
-                            }
-                        });
-
-                        return;
-                    }
-                }
-
-                MessageBox.Show(Resources.TaskHelpers_TweetMessage_Unable_to_find_valid_Twitter_account_, "ShareX", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+           
         }
 
         public static EDataType FindDataType(string filePath, TaskSettings taskSettings)
@@ -1650,53 +1612,10 @@ namespace ShareX
             }
         }
 
-        public static void OpenUploadersConfigWindow(IUploaderService uploaderService = null)
-        {
-            SettingManager.WaitUploadersConfig();
-
-            bool firstInstance = !UploadersConfigForm.IsInstanceActive;
-
-            UploadersConfigForm form = UploadersConfigForm.GetFormInstance(Program.UploadersConfig);
-
-            if (firstInstance)
-            {
-                form.FormClosed += (sender, e) => SettingManager.SaveUploadersConfigAsync();
-
-                if (uploaderService != null)
-                {
-                    form.NavigateToTabPage(uploaderService.GetUploadersConfigTabPage(form));
-                }
-
-                form.Show();
-            }
-            else
-            {
-                if (uploaderService != null)
-                {
-                    form.NavigateToTabPage(uploaderService.GetUploadersConfigTabPage(form));
-                }
-
-                form.ForceActivate();
-            }
-        }
 
         public static void OpenCustomUploaderSettingsWindow()
         {
-            SettingManager.WaitUploadersConfig();
 
-            bool firstInstance = !CustomUploaderSettingsForm.IsInstanceActive;
-
-            CustomUploaderSettingsForm form = CustomUploaderSettingsForm.GetFormInstance(Program.UploadersConfig);
-
-            if (firstInstance)
-            {
-                form.FormClosed += (sender, e) => SettingManager.SaveUploadersConfigAsync();
-                form.Show();
-            }
-            else
-            {
-                form.ForceActivate();
-            }
         }
 
         public static Image FindMenuIcon<T>(T value) where T : Enum
@@ -1721,10 +1640,10 @@ namespace ShareX
                     case AfterCaptureTasks.CopyFileToClipboard: return Resources.clipboard_block;
                     case AfterCaptureTasks.CopyFilePathToClipboard: return Resources.clipboard_list;
                     case AfterCaptureTasks.ShowInExplorer: return Resources.folder_stand;
-                    case AfterCaptureTasks.ScanQRCode: return ShareXResources.IsDarkTheme ? Resources.barcode_2d_white : Resources.barcode_2d;
-                    case AfterCaptureTasks.DoOCR: return ShareXResources.IsDarkTheme ? Resources.edit_drop_cap_white : Resources.edit_drop_cap;
-                    case AfterCaptureTasks.ShowBeforeUploadWindow: return Resources.application__arrow;
-                    case AfterCaptureTasks.UploadImageToHost: return Resources.upload_cloud;
+                    //case AfterCaptureTasks.ScanQRCode: return ShareXResources.IsDarkTheme ? Resources.barcode_2d_white : Resources.barcode_2d;
+                    //case AfterCaptureTasks.DoOCR: return ShareXResources.IsDarkTheme ? Resources.edit_drop_cap_white : Resources.edit_drop_cap;
+                    //case AfterCaptureTasks.ShowBeforeUploadWindow: return Resources.application__arrow;
+                    //case AfterCaptureTasks.UploadImageToHost: return Resources.upload_cloud;
                     case AfterCaptureTasks.DeleteFile: return Resources.bin;
                 }
             }
@@ -1791,7 +1710,6 @@ namespace ShareX
                     case HotkeyType.PinToScreenFromScreen: return Resources.pin;
                     case HotkeyType.PinToScreenFromClipboard: return Resources.pin;
                     case HotkeyType.PinToScreenFromFile: return Resources.pin;
-                    case HotkeyType.PinToScreenCloseAll: return Resources.pin__minus;
                     case HotkeyType.ImageEditor: return Resources.image_pencil;
                     case HotkeyType.ImageBeautifier: return Resources.picture_sunset;
                     case HotkeyType.ImageEffects: return Resources.image_saturation;
@@ -1853,103 +1771,7 @@ namespace ShareX
 
         public static void ImportCustomUploader(string filePath)
         {
-            if (Program.UploadersConfig != null)
-            {
-                try
-                {
-                    CustomUploaderItem cui = JsonHelpers.DeserializeFromFile<CustomUploaderItem>(filePath);
-
-                    if (cui != null)
-                    {
-                        bool activate = false;
-
-                        if (cui.DestinationType == CustomUploaderDestinationType.None)
-                        {
-                            DialogResult result = MessageBox.Show($"Would you like to add \"{cui}\" custom uploader?",
-                                "ShareX - Custom uploader confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-
-                            if (result == DialogResult.No)
-                            {
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            List<string> destinations = new List<string>();
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.ImageUploader)) destinations.Add("images");
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.TextUploader)) destinations.Add("texts");
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.FileUploader)) destinations.Add("files");
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.URLShortener) ||
-                                cui.DestinationType.HasFlag(CustomUploaderDestinationType.URLSharingService)) destinations.Add("urls");
-
-                            string destinationsText = string.Join("/", destinations);
-
-                            DialogResult result = MessageBox.Show($"Would you like to set \"{cui}\" as the active custom uploader for {destinationsText}?",
-                                "ShareX - Custom uploader confirmation", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
-
-                            if (result == DialogResult.Yes)
-                            {
-                                activate = true;
-                            }
-                            else if (result == DialogResult.Cancel)
-                            {
-                                return;
-                            }
-                        }
-
-                        cui.CheckBackwardCompatibility();
-                        Program.UploadersConfig.CustomUploadersList.Add(cui);
-
-                        if (activate)
-                        {
-                            int index = Program.UploadersConfig.CustomUploadersList.Count - 1;
-
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.ImageUploader))
-                            {
-                                Program.UploadersConfig.CustomImageUploaderSelected = index;
-                                Program.DefaultTaskSettings.ImageDestination = ImageDestination.CustomImageUploader;
-                            }
-
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.TextUploader))
-                            {
-                                Program.UploadersConfig.CustomTextUploaderSelected = index;
-                                Program.DefaultTaskSettings.TextDestination = TextDestination.CustomTextUploader;
-                            }
-
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.FileUploader))
-                            {
-                                Program.UploadersConfig.CustomFileUploaderSelected = index;
-                                Program.DefaultTaskSettings.FileDestination = FileDestination.CustomFileUploader;
-                            }
-
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.URLShortener))
-                            {
-                                Program.UploadersConfig.CustomURLShortenerSelected = index;
-                                Program.DefaultTaskSettings.URLShortenerDestination = UrlShortenerType.CustomURLShortener;
-                            }
-
-                            if (cui.DestinationType.HasFlag(CustomUploaderDestinationType.URLSharingService))
-                            {
-                                Program.UploadersConfig.CustomURLSharingServiceSelected = index;
-                                Program.DefaultTaskSettings.URLSharingServiceDestination = URLSharingServices.CustomURLSharingService;
-                            }
-
-                            Program.MainForm.UpdateCheckStates();
-                            Program.MainForm.UpdateUploaderMenuNames();
-                        }
-
-                        if (CustomUploaderSettingsForm.IsInstanceActive)
-                        {
-                            CustomUploaderSettingsForm.CustomUploaderUpdateTab();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    DebugHelper.WriteException(e);
-                    e.ShowError();
-                }
-            }
+           
         }
 
         public static void ImportImageEffect(string filePath)

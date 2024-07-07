@@ -82,33 +82,6 @@ namespace ShareX
             }
         }
 
-        public void Add(WorkerTask task)
-        {
-            string info = task.Info.ToString();
-
-            if (!string.IsNullOrEmpty(info))
-            {
-                RecentTask recentItem = new RecentTask()
-                {
-                    FilePath = task.Info.FilePath,
-                    URL = task.Info.Result.URL,
-                    ThumbnailURL = task.Info.Result.ThumbnailURL,
-                    DeletionURL = task.Info.Result.DeletionURL,
-                    ShortenedURL = task.Info.Result.ShortenedURL
-                };
-
-                Add(recentItem);
-            }
-
-            if (Program.Settings.RecentTasksSave)
-            {
-                Program.Settings.RecentTasks = Tasks.ToArray();
-            }
-            else
-            {
-                Program.Settings.RecentTasks = null;
-            }
-        }
 
         public void Add(RecentTask task)
         {

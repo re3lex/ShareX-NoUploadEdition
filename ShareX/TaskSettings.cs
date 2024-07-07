@@ -29,7 +29,6 @@ using ShareX.ImageEffectsLib;
 using ShareX.IndexerLib;
 using ShareX.MediaLib;
 using ShareX.ScreenCaptureLib;
-using ShareX.UploadersLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,19 +52,19 @@ namespace ShareX
         public HotkeyType Job = HotkeyType.None;
 
         public bool UseDefaultAfterCaptureJob = true;
-        public AfterCaptureTasks AfterCaptureJob = AfterCaptureTasks.CopyImageToClipboard | AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.UploadImageToHost;
+        public AfterCaptureTasks AfterCaptureJob = AfterCaptureTasks.CopyImageToClipboard | AfterCaptureTasks.SaveImageToFile;
 
         public bool UseDefaultAfterUploadJob = true;
         public AfterUploadTasks AfterUploadJob = AfterUploadTasks.CopyURLToClipboard;
 
         public bool UseDefaultDestinations = true;
-        public ImageDestination ImageDestination = ImageDestination.Imgur;
-        public FileDestination ImageFileDestination = FileDestination.Dropbox;
-        public TextDestination TextDestination = TextDestination.Pastebin;
-        public FileDestination TextFileDestination = FileDestination.Dropbox;
-        public FileDestination FileDestination = FileDestination.Dropbox;
-        public UrlShortenerType URLShortenerDestination = UrlShortenerType.BITLY;
-        public URLSharingServices URLSharingServiceDestination = URLSharingServices.Twitter;
+        //public ImageDestination ImageDestination = ImageDestination.Imgur;
+        //public FileDestination ImageFileDestination = FileDestination.Dropbox;
+        //public TextDestination TextDestination = TextDestination.Pastebin;
+        //public FileDestination TextFileDestination = FileDestination.Dropbox;
+        //public FileDestination FileDestination = FileDestination.Dropbox;
+        //public UrlShortenerType URLShortenerDestination = UrlShortenerType.BITLY;
+        //public URLSharingServices URLSharingServiceDestination = URLSharingServices.Twitter;
 
         public bool OverrideFTP = false;
         public int FTPIndex = 0;
@@ -203,13 +202,13 @@ namespace ShareX
 
                 if (UseDefaultDestinations)
                 {
-                    ImageDestination = defaultTaskSettings.ImageDestination;
-                    ImageFileDestination = defaultTaskSettings.ImageFileDestination;
-                    TextDestination = defaultTaskSettings.TextDestination;
-                    TextFileDestination = defaultTaskSettings.TextFileDestination;
-                    FileDestination = defaultTaskSettings.FileDestination;
-                    URLShortenerDestination = defaultTaskSettings.URLShortenerDestination;
-                    URLSharingServiceDestination = defaultTaskSettings.URLSharingServiceDestination;
+                    //ImageDestination = defaultTaskSettings.ImageDestination;
+                    //ImageFileDestination = defaultTaskSettings.ImageFileDestination;
+                    //TextDestination = defaultTaskSettings.TextDestination;
+                    //TextFileDestination = defaultTaskSettings.TextFileDestination;
+                    //FileDestination = defaultTaskSettings.FileDestination;
+                    //URLShortenerDestination = defaultTaskSettings.URLShortenerDestination;
+                    //URLSharingServiceDestination = defaultTaskSettings.URLSharingServiceDestination;
                 }
 
                 if (UseDefaultGeneralSettings)
@@ -284,20 +283,6 @@ namespace ShareX
             if (UseDefaultAdvancedSettings)
             {
                 AdvancedSettings = null;
-            }
-        }
-
-        public FileDestination GetFileDestinationByDataType(EDataType dataType)
-        {
-            switch (dataType)
-            {
-                case EDataType.Image:
-                    return ImageFileDestination;
-                case EDataType.Text:
-                    return TextFileDestination;
-                default:
-                case EDataType.File:
-                    return FileDestination;
             }
         }
     }
@@ -443,7 +428,7 @@ namespace ShareX
 
         #region Upload / Uploader filters
 
-        public List<UploaderFilter> UploaderFilters = new List<UploaderFilter>();
+        
 
         #endregion Upload / Uploader filters
     }

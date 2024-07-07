@@ -25,7 +25,6 @@
 
 using ShareX.HelpersLib;
 using ShareX.HistoryLib;
-using ShareX.UploadersLib;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -137,9 +136,6 @@ namespace ShareX
 
         public int MaxUploadFailRetry = 1;
         public bool UseSecondaryUploaders = false;
-        public List<ImageDestination> SecondaryImageUploaders = new List<ImageDestination>();
-        public List<TextDestination> SecondaryTextUploaders = new List<TextDestination>();
-        public List<FileDestination> SecondaryFileUploaders = new List<FileDestination>();
 
         #endregion Upload
 

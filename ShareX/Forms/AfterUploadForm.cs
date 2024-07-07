@@ -24,7 +24,6 @@
 #endregion License Information (GPL v3)
 
 using ShareX.HelpersLib;
-using ShareX.UploadersLib;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -57,17 +56,6 @@ namespace ShareX
 
             bool isFileExist = !string.IsNullOrEmpty(info.FilePath) && File.Exists(info.FilePath);
 
-            if (info.DataType == EDataType.Image)
-            {
-                if (isFileExist)
-                {
-                    pbPreview.LoadImageFromFileAsync(info.FilePath);
-                }
-                else
-                {
-                    pbPreview.LoadImageFromURLAsync(info.Result.URL);
-                }
-            }
 
             Text = "ShareX - " + (isFileExist ? info.FilePath : info.FileName);
 
@@ -77,24 +65,6 @@ namespace ShareX
             lvClipboardFormats.Groups.Add(lvgLocal);
             lvClipboardFormats.Groups.Add(lvgCustom);
 
-            foreach (LinkFormatEnum type in Helpers.GetEnums<LinkFormatEnum>())
-            {
-                if (!FileHelpers.IsImageFile(Info.Result.URL) &&
-                    (type == LinkFormatEnum.HTMLImage || type == LinkFormatEnum.HTMLLinkedImage ||
-                    type == LinkFormatEnum.ForumImage || type == LinkFormatEnum.ForumLinkedImage ||
-                    type == LinkFormatEnum.WikiImage || type == LinkFormatEnum.WikiLinkedImage))
-                    continue;
-
-                AddFormat(type.GetLocalizedDescription(), GetUrlByType(type));
-            }
-
-            if (FileHelpers.IsImageFile(Info.Result.URL))
-            {
-                foreach (ClipboardFormat cf in Program.Settings.ClipboardContentFormats)
-                {
-                    AddFormat(cf.Description, parser.Parse(Info, cf.Format), lvgCustom);
-                }
-            }
         }
 
         private void AddFormat(string description, string text, ListViewGroup group = null)
@@ -168,15 +138,6 @@ namespace ShareX
             }
         }
 
-        private void btnOpenLink_Click(object sender, EventArgs e)
-        {
-            string url = Info.Result.URL;
-
-            if (!string.IsNullOrEmpty(url))
-            {
-                URLHelpers.OpenURL(url);
-            }
-        }
 
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
@@ -195,37 +156,6 @@ namespace ShareX
         }
 
         #region TaskInfo helper methods
-
-        public string GetUrlByType(LinkFormatEnum type)
-        {
-            switch (type)
-            {
-                case LinkFormatEnum.URL:
-                    return Info.Result.URL;
-                case LinkFormatEnum.ShortenedURL:
-                    return Info.Result.ShortenedURL;
-                case LinkFormatEnum.ForumImage:
-                    return parser.Parse(Info, UploadInfoParser.ForumImage);
-                case LinkFormatEnum.HTMLImage:
-                    return parser.Parse(Info, UploadInfoParser.HTMLImage);
-                case LinkFormatEnum.WikiImage:
-                    return parser.Parse(Info, UploadInfoParser.WikiImage);
-                case LinkFormatEnum.ForumLinkedImage:
-                    return parser.Parse(Info, UploadInfoParser.ForumLinkedImage);
-                case LinkFormatEnum.HTMLLinkedImage:
-                    return parser.Parse(Info, UploadInfoParser.HTMLLinkedImage);
-                case LinkFormatEnum.WikiLinkedImage:
-                    return parser.Parse(Info, UploadInfoParser.WikiLinkedImage);
-                case LinkFormatEnum.ThumbnailURL:
-                    return Info.Result.ThumbnailURL;
-                case LinkFormatEnum.LocalFilePath:
-                    return Info.FilePath;
-                case LinkFormatEnum.LocalFilePathUri:
-                    return GetLocalFilePathAsUri(Info.FilePath);
-            }
-
-            return Info.Result.URL;
-        }
 
         public string GetLocalFilePathAsUri(string fp)
         {

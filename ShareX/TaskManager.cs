@@ -26,7 +26,6 @@
 using ShareX.HelpersLib;
 using ShareX.HistoryLib;
 using ShareX.Properties;
-using ShareX.UploadersLib;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -61,7 +60,7 @@ namespace ShareX
                     task.UploadProgressChanged += Task_UploadProgressChanged;
                     task.UploadCompleted += Task_UploadCompleted;
                     task.TaskCompleted += Task_TaskCompleted;
-                    task.UploadersConfigWindowRequested += Task_UploadersConfigWindowRequested;
+                    
                 }
 
                 TaskListView.AddItem(task);
@@ -191,284 +190,23 @@ namespace ShareX
 
         private static void Task_UploadProgressChanged(WorkerTask task)
         {
-            if (task.Status == TaskStatus.Working)
-            {
-                TaskInfo info = task.Info;
-
-                ListViewItem lvi = TaskListView.FindItem(task);
-
-                if (lvi != null)
-                {
-                    lvi.SubItems[1].Text = string.Format("{0:0.0}%", info.Progress.Percentage);
-                    lvi.SubItems[2].Text = string.Format("{0} / {1}", info.Progress.Position.ToSizeString(Program.Settings.BinaryUnits),
-                        info.Progress.Length.ToSizeString(Program.Settings.BinaryUnits));
-
-                    if (info.Progress.Speed > 0)
-                    {
-                        lvi.SubItems[3].Text = ((long)info.Progress.Speed).ToSizeString(Program.Settings.BinaryUnits) + "/s";
-                    }
-
-                    lvi.SubItems[4].Text = Helpers.ProperTimeSpan(info.Progress.Elapsed);
-                    lvi.SubItems[5].Text = Helpers.ProperTimeSpan(info.Progress.Remaining);
-                }
-
-                TaskThumbnailPanel panel = TaskThumbnailView.FindPanel(task);
-
-                if (panel != null)
-                {
-                    panel.UpdateProgress();
-                }
-
-                UpdateProgressUI();
-            }
+           
         }
 
         private static void Task_UploadCompleted(WorkerTask task)
         {
-            TaskInfo info = task.Info;
-
-            if (info != null && info.Result != null && !info.Result.IsError)
-            {
-                string url = info.Result.ToString();
-
-                if (!string.IsNullOrEmpty(url))
-                {
-                    string text = $"Upload completed. URL: {url}";
-
-                    if (info.UploadDuration != null)
-                    {
-                        text += $", Duration: {info.UploadDuration.ElapsedMilliseconds} ms";
-                    }
-
-                    DebugHelper.WriteLine(text);
-                }
-            }
-
-            TaskThumbnailPanel panel = TaskThumbnailView.FindPanel(task);
-
-            if (panel != null)
-            {
-                panel.ProgressVisible = false;
-            }
+            
         }
 
         private static void Task_TaskCompleted(WorkerTask task)
         {
-            try
-            {
-                if (task != null)
-                {
-                    task.KeepImage = false;
-
-                    if (task.RequestSettingUpdate)
-                    {
-                        Program.MainForm.UpdateCheckStates();
-                    }
-
-                    TaskInfo info = task.Info;
-
-                    if (info != null && info.Result != null)
-                    {
-                        TaskThumbnailPanel panel = TaskThumbnailView.FindPanel(task);
-
-                        if (panel != null)
-                        {
-                            panel.UpdateStatus();
-                            panel.ProgressVisible = false;
-                        }
-
-                        ListViewItem lvi = TaskListView.FindItem(task);
-
-                        if (task.Status == TaskStatus.Stopped)
-                        {
-                            DebugHelper.WriteLine($"Task stopped. File name: {info.FileName}");
-
-                            if (lvi != null)
-                            {
-                                lvi.Text = info.FileName;
-                                lvi.SubItems[1].Text = info.Status;
-                                lvi.ImageIndex = 2;
-                            }
-                        }
-                        else if (task.Status == TaskStatus.Failed)
-                        {
-                            string errors = info.Result.Errors.ToString();
-
-                            DebugHelper.WriteLine($"Task failed. File name: {info.FileName}, Errors:\r\n{errors}");
-
-                            if (lvi != null)
-                            {
-                                lvi.SubItems[1].Text = info.Status;
-                                lvi.SubItems[6].Text = "";
-                                lvi.ImageIndex = 1;
-                            }
-
-                            if (!info.TaskSettings.GeneralSettings.DisableNotifications)
-                            {
-                                if (info.TaskSettings.GeneralSettings.PlaySoundAfterUpload)
-                                {
-                                    TaskHelpers.PlayErrorSound(info.TaskSettings);
-                                }
-
-                                if (info.Result.Errors.Count > 0)
-                                {
-                                    UploaderErrorInfo error = info.Result.Errors.Errors[0];
-
-                                    string title = error.Title;
-                                    if (string.IsNullOrEmpty(title))
-                                    {
-                                        title = Resources.TaskManager_task_UploadCompleted_Error;
-                                    }
-
-                                    if (info.TaskSettings.GeneralSettings.ShowToastNotificationAfterTaskCompleted && !string.IsNullOrEmpty(error.Text) &&
-                                        (!info.TaskSettings.GeneralSettings.DisableNotificationsOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
-                                    {
-                                        TaskHelpers.ShowNotificationTip(error.Text, "ShareX - " + title, 5000);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            DebugHelper.WriteLine($"Task completed. File name: {info.FileName}, Duration: {(long)info.TaskDuration.TotalMilliseconds} ms");
-
-                            string result = info.ToString();
-
-                            if (lvi != null)
-                            {
-                                lvi.Text = info.FileName;
-                                lvi.SubItems[1].Text = info.Status;
-                                lvi.ImageIndex = 2;
-
-                                if (!string.IsNullOrEmpty(result))
-                                {
-                                    lvi.SubItems[6].Text = result;
-                                }
-                            }
-
-                            if (!task.StopRequested && !string.IsNullOrEmpty(result))
-                            {
-                                if (Program.Settings.HistorySaveTasks && (!Program.Settings.HistoryCheckURL ||
-                                   (!string.IsNullOrEmpty(info.Result.URL) || !string.IsNullOrEmpty(info.Result.ShortenedURL))))
-                                {
-                                    HistoryItem historyItem = info.GetHistoryItem();
-                                    AppendHistoryItemAsync(historyItem);
-                                }
-
-                                RecentManager.Add(task);
-
-                                if (!info.TaskSettings.GeneralSettings.DisableNotifications && info.Job != TaskJob.ShareURL)
-                                {
-                                    if (info.TaskSettings.GeneralSettings.PlaySoundAfterUpload)
-                                    {
-                                        TaskHelpers.PlayTaskCompleteSound(info.TaskSettings);
-                                    }
-
-                                    if (!string.IsNullOrEmpty(info.TaskSettings.AdvancedSettings.BalloonTipContentFormat))
-                                    {
-                                        result = new UploadInfoParser().Parse(info, info.TaskSettings.AdvancedSettings.BalloonTipContentFormat);
-                                    }
-
-                                    if (info.TaskSettings.GeneralSettings.ShowToastNotificationAfterTaskCompleted && !string.IsNullOrEmpty(result) &&
-                                        (!info.TaskSettings.GeneralSettings.DisableNotificationsOnFullscreen || !CaptureHelpers.IsActiveWindowFullscreen()))
-                                    {
-                                        task.KeepImage = true;
-
-                                        NotificationFormConfig toastConfig = new NotificationFormConfig()
-                                        {
-                                            Duration = (int)(info.TaskSettings.GeneralSettings.ToastWindowDuration * 1000),
-                                            FadeDuration = (int)(info.TaskSettings.GeneralSettings.ToastWindowFadeDuration * 1000),
-                                            Placement = info.TaskSettings.GeneralSettings.ToastWindowPlacement,
-                                            Size = info.TaskSettings.GeneralSettings.ToastWindowSize,
-                                            LeftClickAction = info.TaskSettings.GeneralSettings.ToastWindowLeftClickAction,
-                                            RightClickAction = info.TaskSettings.GeneralSettings.ToastWindowRightClickAction,
-                                            MiddleClickAction = info.TaskSettings.GeneralSettings.ToastWindowMiddleClickAction,
-                                            FilePath = info.FilePath,
-                                            Image = task.Image,
-                                            Title = "ShareX - " + Resources.TaskManager_task_UploadCompleted_ShareX___Task_completed,
-                                            Text = result,
-                                            URL = result
-                                        };
-
-                                        NotificationForm.Show(toastConfig);
-
-                                        if (info.TaskSettings.AfterUploadJob.HasFlag(AfterUploadTasks.ShowAfterUploadWindow) && info.IsUploadJob)
-                                        {
-                                            AfterUploadForm dlg = new AfterUploadForm(info);
-                                            NativeMethods.ShowWindow(dlg.Handle, (int)WindowShowStyle.ShowNoActivate);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (lvi != null)
-                        {
-                            lvi.EnsureVisible();
-
-                            if (Program.Settings.AutoSelectLastCompletedTask)
-                            {
-                                TaskListView.ListViewControl.SelectSingle(lvi);
-                            }
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                if (!IsBusy && Program.CLI.IsCommandExist("AutoClose"))
-                {
-                    Application.Exit();
-                }
-                else
-                {
-                    StartTasks();
-                    UpdateProgressUI();
-
-                    if (Program.Settings.SaveSettingsAfterTaskCompleted && !IsBusy)
-                    {
-                        SettingManager.SaveAllSettingsAsync();
-                    }
-                }
-            }
+           
         }
 
-        private static void Task_UploadersConfigWindowRequested(IUploaderService uploaderService)
-        {
-            TaskHelpers.OpenUploadersConfigWindow(uploaderService);
-        }
 
         public static void UpdateProgressUI()
         {
-            bool isTasksWorking = false;
-            double averageProgress = 0;
-
-            IEnumerable<WorkerTask> workingTasks = Tasks.Where(x => x != null && x.Status == TaskStatus.Working && x.Info != null);
-
-            if (workingTasks.Count() > 0)
-            {
-                isTasksWorking = true;
-
-                workingTasks = workingTasks.Where(x => x.Info.Progress != null);
-
-                if (workingTasks.Count() > 0)
-                {
-                    averageProgress = workingTasks.Average(x => x.Info.Progress.Percentage);
-                }
-            }
-
-            if (isTasksWorking)
-            {
-                Program.MainForm.Text = string.Format("{0} - {1:0.0}%", Program.Title, averageProgress);
-                UpdateTrayIcon((int)averageProgress);
-                TaskbarManager.SetProgressValue(Program.MainForm, (int)averageProgress);
-            }
-            else
-            {
-                Program.MainForm.Text = Program.Title;
-                UpdateTrayIcon();
-                TaskbarManager.SetProgressState(Program.MainForm, TaskbarProgressBarStatus.NoProgress);
-            }
+           
         }
 
         public static void UpdateTrayIcon(int progress = -1)

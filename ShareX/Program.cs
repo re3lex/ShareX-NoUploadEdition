@@ -25,7 +25,6 @@
 
 using ShareX.HelpersLib;
 using ShareX.Properties;
-using ShareX.UploadersLib;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,7 +43,7 @@ namespace ShareX
 {
     internal static class Program
     {
-        public const string AppName = "ShareX";
+        public const string AppName = "ShareX-NoUploadEdition";
         public const string MutexName = "82E6AC09-0FEF-4390-AD9F-0DD3F5561EFC";
         public static readonly string PipeName = $"{Environment.MachineName}-{Environment.UserName}-{AppName}";
 
@@ -111,7 +110,7 @@ namespace ShareX
             }
         }
 
-        public static bool Dev { get; } = true;
+        public static bool Dev { get; } = false;
         public static bool MultiInstance { get; private set; }
         public static bool Portable { get; private set; }
         public static bool SilentRun { get; private set; }
@@ -123,7 +122,6 @@ namespace ShareX
 
         internal static ApplicationConfig Settings { get; set; }
         internal static TaskSettings DefaultTaskSettings { get; set; }
-        internal static UploadersConfig UploadersConfig { get; set; }
         internal static HotkeysConfig HotkeysConfig { get; set; }
 
         internal static MainForm MainForm { get; private set; }
@@ -351,7 +349,6 @@ namespace ShareX
 
             SettingManager.LoadInitialSettings();
 
-            Uploader.UpdateServicePointManager();
             UpdateManager = new ShareXUpdateManager();
             LanguageHelper.ChangeLanguage(Settings.Language);
             CleanupManager.CleanupAsync();

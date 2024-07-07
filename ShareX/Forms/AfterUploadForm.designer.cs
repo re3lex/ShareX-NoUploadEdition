@@ -68,13 +68,7 @@
             this.btnCopyLink.Name = "btnCopyLink";
             this.btnCopyLink.UseVisualStyleBackColor = true;
             this.btnCopyLink.Click += new System.EventHandler(this.btnCopyLink_Click);
-            // 
-            // btnOpenLink
-            // 
-            resources.ApplyResources(this.btnOpenLink, "btnOpenLink");
-            this.btnOpenLink.Name = "btnOpenLink";
-            this.btnOpenLink.UseVisualStyleBackColor = true;
-            this.btnOpenLink.Click += new System.EventHandler(this.btnOpenLink_Click);
+
             // 
             // btnOpenFile
             // 

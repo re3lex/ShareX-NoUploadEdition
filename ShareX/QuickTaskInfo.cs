@@ -63,12 +63,12 @@ namespace ShareX
 
         public static List<QuickTaskInfo> DefaultPresets => new List<QuickTaskInfo>()
         {
-            new QuickTaskInfo("Save, Upload, Copy URL", AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
+            //new QuickTaskInfo("Save, Upload, Copy URL", AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
             new QuickTaskInfo("Save, Copy image", AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.CopyImageToClipboard),
             new QuickTaskInfo("Save, Copy image file", AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.CopyFileToClipboard),
-            new QuickTaskInfo("Annotate, Save, Upload, Copy URL", AfterCaptureTasks.AnnotateImage | AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
+            //new QuickTaskInfo("Annotate, Save, Upload, Copy URL", AfterCaptureTasks.AnnotateImage | AfterCaptureTasks.SaveImageToFile | AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
             new QuickTaskInfo(),
-            new QuickTaskInfo("Upload, Copy URL", AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
+            //new QuickTaskInfo("Upload, Copy URL", AfterCaptureTasks.UploadImageToHost, AfterUploadTasks.CopyURLToClipboard),
             new QuickTaskInfo("Save", AfterCaptureTasks.SaveImageToFile),
             new QuickTaskInfo("Copy image", AfterCaptureTasks.CopyImageToClipboard),
             new QuickTaskInfo("Annotate", AfterCaptureTasks.AnnotateImage)
@@ -98,7 +98,7 @@ namespace ShareX
 
             string result = string.Join(", ", AfterCaptureTasks.GetFlags().Select(x => x.GetLocalizedDescription()));
 
-            if (AfterCaptureTasks.HasFlag(AfterCaptureTasks.UploadImageToHost))
+           /* if (AfterCaptureTasks.HasFlag(AfterCaptureTasks.UploadImageToHost))
             {
                 string[] flags = AfterUploadTasks.GetFlags().Select(x => x.GetLocalizedDescription()).ToArray();
 
@@ -106,7 +106,7 @@ namespace ShareX
                 {
                     result += ", " + string.Join(", ", flags);
                 }
-            }
+            }*/
 
             return result;
         }

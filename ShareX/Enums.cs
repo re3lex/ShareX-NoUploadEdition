@@ -143,10 +143,10 @@ namespace ShareX
         CopyFileToClipboard = 1 << 12,
         CopyFilePathToClipboard = 1 << 13,
         ShowInExplorer = 1 << 14,
-        ScanQRCode = 1 << 15,
-        DoOCR = 1 << 16,
-        ShowBeforeUploadWindow = 1 << 17,
-        UploadImageToHost = 1 << 18,
+        //ScanQRCode = 1 << 15,
+        //DoOCR = 1 << 16,
+        //ShowBeforeUploadWindow = 1 << 17,
+        //UploadImageToHost = 1 << 18,
         DeleteFile = 1 << 19
     }
 
@@ -269,8 +269,6 @@ namespace ShareX
         PinToScreenFromClipboard,
         [Category(EnumExtensions.HotkeyType_Category_Tools)]
         PinToScreenFromFile,
-        [Category(EnumExtensions.HotkeyType_Category_Tools)]
-        PinToScreenCloseAll,
         [Category(EnumExtensions.HotkeyType_Category_Tools)]
         ImageEditor,
         [Category(EnumExtensions.HotkeyType_Category_Tools)]

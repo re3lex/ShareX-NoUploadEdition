@@ -183,7 +183,7 @@ namespace ShareX.ScreenCaptureLib
                 tsbUploadImage.DisplayStyle = ToolStripItemDisplayStyle.Image;
                 tsbUploadImage.Image = Resources.drive_globe;
                 tsbUploadImage.Click += (sender, e) => Form.OnUploadImageRequested();
-                tsMain.Items.Add(tsbUploadImage);
+               // tsMain.Items.Add(tsbUploadImage);
 
                 ToolStripButton tsbPrintImage = new ToolStripButton(Resources.ShapeManager_CreateToolbar_PrintImage);
                 tsbPrintImage.DisplayStyle = ToolStripItemDisplayStyle.Image;

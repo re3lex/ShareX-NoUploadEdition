@@ -27,7 +27,6 @@ using ShareX.HelpersLib;
 using ShareX.HistoryLib;
 using ShareX.Properties;
 using ShareX.ScreenCaptureLib;
-using ShareX.UploadersLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -102,7 +101,6 @@ namespace ShareX
 
         private static ApplicationConfig Settings { get => Program.Settings; set => Program.Settings = value; }
         private static TaskSettings DefaultTaskSettings { get => Program.DefaultTaskSettings; set => Program.DefaultTaskSettings = value; }
-        private static UploadersConfig UploadersConfig { get => Program.UploadersConfig; set => Program.UploadersConfig = value; }
         private static HotkeysConfig HotkeysConfig { get => Program.HotkeysConfig; set => Program.HotkeysConfig = value; }
 
         private static ManualResetEvent uploadersConfigResetEvent = new ManualResetEvent(false);
@@ -124,10 +122,7 @@ namespace ShareX
 
         public static void WaitUploadersConfig()
         {
-            if (UploadersConfig == null)
-            {
-                uploadersConfigResetEvent.WaitOne();
-            }
+
         }
 
         public static void WaitHotkeysConfig()
@@ -167,11 +162,7 @@ namespace ShareX
 
         public static void LoadUploadersConfig(bool fallbackSupport = true)
         {
-            UploadersConfig = UploadersConfig.Load(UploadersConfigFilePath, BackupFolder, fallbackSupport);
-            UploadersConfig.CreateBackup = true;
-            UploadersConfig.CreateWeeklyBackup = true;
-            UploadersConfig.SupportDPAPIEncryption = true;
-            UploadersConfigBackwardCompatibilityTasks();
+
         }
 
         public static void LoadHotkeysConfig(bool fallbackSupport = true)
@@ -193,7 +184,7 @@ namespace ShareX
         {
             if (Settings.IsFirstTimeRun && SystemOptions.DisableUpload)
             {
-                DefaultTaskSettings.AfterCaptureJob = DefaultTaskSettings.AfterCaptureJob.Remove(AfterCaptureTasks.UploadImageToHost);
+               // DefaultTaskSettings.AfterCaptureJob = DefaultTaskSettings.AfterCaptureJob.Remove(AfterCaptureTasks.UploadImageToHost);
             }
 
             if (Settings.IsUpgradeFrom("14.1.1"))
@@ -272,16 +263,6 @@ namespace ShareX
             }
         }
 
-        private static void UploadersConfigBackwardCompatibilityTasks()
-        {
-            if (UploadersConfig.CustomUploadersList != null)
-            {
-                foreach (CustomUploaderItem cui in UploadersConfig.CustomUploadersList)
-                {
-                    cui.CheckBackwardCompatibility();
-                }
-            }
-        }
 
         private static void HotkeysConfigBackwardCompatibilityTasks()
         {
@@ -313,10 +294,6 @@ namespace ShareX
                 Settings.Save(ApplicationConfigFilePath);
             }
 
-            if (UploadersConfig != null)
-            {
-                UploadersConfig.Save(UploadersConfigFilePath);
-            }
 
             if (HotkeysConfig != null)
             {
@@ -335,10 +312,7 @@ namespace ShareX
 
         public static void SaveUploadersConfigAsync()
         {
-            if (UploadersConfig != null)
-            {
-                UploadersConfig.SaveAsync(UploadersConfigFilePath);
-            }
+
         }
 
         public static void SaveHotkeysConfigAsync()
@@ -371,7 +345,7 @@ namespace ShareX
 
         public static bool Export(string archivePath, bool settings, bool history)
         {
-            MemoryStream msApplicationConfig = null, msUploadersConfig = null, msHotkeysConfig = null;
+            MemoryStream msApplicationConfig = null,  msHotkeysConfig = null;
 
             try
             {
@@ -382,9 +356,7 @@ namespace ShareX
                     msApplicationConfig = Settings.SaveToMemoryStream(false);
                     entries.Add(new ZipEntryInfo(msApplicationConfig, ApplicationConfigFileName));
 
-                    msUploadersConfig = UploadersConfig.SaveToMemoryStream(false);
-                    entries.Add(new ZipEntryInfo(msUploadersConfig, UploadersConfigFileName));
-
+                    
                     msHotkeysConfig = HotkeysConfig.SaveToMemoryStream(false);
                     entries.Add(new ZipEntryInfo(msHotkeysConfig, HotkeysConfigFileName));
                 }
@@ -405,7 +377,6 @@ namespace ShareX
             finally
             {
                 msApplicationConfig?.Dispose();
-                msUploadersConfig?.Dispose();
                 msHotkeysConfig?.Dispose();
             }
 

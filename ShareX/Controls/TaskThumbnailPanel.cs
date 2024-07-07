@@ -394,19 +394,6 @@ namespace ShareX
             return null;
         }
 
-        public void UpdateProgress()
-        {
-            if (Task.Info != null)
-            {
-                Progress = (int)Task.Info.Progress.Percentage;
-
-                if (HelpersOptions.DevMode)
-                {
-                    pbProgress.Text = string.Format("{0} / {1}", Task.Info.Progress.Position.ToSizeString(Program.Settings.BinaryUnits),
-                        Task.Info.Progress.Length.ToSizeString(Program.Settings.BinaryUnits));
-                }
-            }
-        }
 
         public void UpdateStatus()
         {
@@ -493,12 +480,7 @@ namespace ShareX
                             FileHelpers.OpenFolderWithFile(filePath);
                         }
                         break;
-                    case ThumbnailViewClickAction.OpenURL:
-                        if (info.Result != null)
-                        {
-                            URLHelpers.OpenURL(info.Result.ToString());
-                        }
-                        break;
+
                     case ThumbnailViewClickAction.EditImage:
                         if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath) && FileHelpers.IsImageFile(filePath))
                         {
@@ -513,16 +495,7 @@ namespace ShareX
         {
             if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left && Task.Info != null)
             {
-                if (Task.Info.Result != null)
-                {
-                    string url = Task.Info.Result.ToString();
-
-                    if (!string.IsNullOrEmpty(url))
-                    {
-                        URLHelpers.OpenURL(url);
-                        return;
-                    }
-                }
+               
 
                 if (!string.IsNullOrEmpty(Task.Info.FilePath))
                 {
